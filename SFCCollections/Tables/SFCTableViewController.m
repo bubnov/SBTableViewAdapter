@@ -10,8 +10,8 @@
 #import "SFCTableItem.h"
 #import "SFCTableViewCell.h"
 #import "NSObject+SFCSafeKVO.h"
-#import "SFObjCExtensions.h"
-#import "SFProxyDelegate.h"
+#import "SFCMacroses.h"
+#import "SFCProxyDelegate.h"
 
 
 NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
