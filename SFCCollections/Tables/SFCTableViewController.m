@@ -21,8 +21,8 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 
 @property (strong, nonatomic) NSMutableArray *mutableSections;
 @property (strong, nonatomic) NSMutableDictionary *fakeCells;
-@property (strong, nonatomic) SFProxyDelegate *dataSourceProxy;
-@property (strong, nonatomic) SFProxyDelegate *delegateProxy;
+@property (strong, nonatomic) SFCProxyDelegate *dataSourceProxy;
+@property (strong, nonatomic) SFCProxyDelegate *delegateProxy;
 @property (nonatomic) UITableViewStyle tableViewStyle;
 
 @end
@@ -54,16 +54,16 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
    typeof(self) __weak weakSelf = self;
    
    [self.tableView sfc_observeKeyPath:@"delegate" block:^(NSString *keyPath, id object, NSDictionary *change) {
-      if (weakSelf.tableView.delegate != self && [weakSelf.tableView.delegate class] != [SFProxyDelegate class]) {
-         weakSelf.delegateProxy = [SFProxyDelegate proxyDelegate:weakSelf.tableView.delegate withDelegate:self];
+      if (weakSelf.tableView.delegate != self && [weakSelf.tableView.delegate class] != [SFCProxyDelegate class]) {
+         weakSelf.delegateProxy = [SFCProxyDelegate proxyDelegate:weakSelf.tableView.delegate withDelegate:self];
          weakSelf.delegateProxy.shouldForwardAllMethods = YES;
          weakSelf.tableView.delegate = (id)weakSelf.delegateProxy;
       }
    }];
    
    [self.tableView sfc_observeKeyPath:@"dataSource" block:^(NSString *keyPath, id object, NSDictionary *change) {
-      if (weakSelf.tableView.dataSource != self && [weakSelf.tableView.dataSource class] != [SFProxyDelegate class]) {
-         weakSelf.dataSourceProxy = [SFProxyDelegate proxyDelegate:weakSelf.tableView.dataSource withDelegate:self];
+      if (weakSelf.tableView.dataSource != self && [weakSelf.tableView.dataSource class] != [SFCProxyDelegate class]) {
+         weakSelf.dataSourceProxy = [SFCProxyDelegate proxyDelegate:weakSelf.tableView.dataSource withDelegate:self];
          weakSelf.dataSourceProxy.shouldForwardAllMethods = YES;
          weakSelf.tableView.dataSource = (id)weakSelf.dataSourceProxy;
       }
@@ -145,7 +145,7 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
       NSIndexSet *indexes = change[@"indexes"];
       NSUInteger sectionIndex = [weakSelf sectionIndexOfCollectionSection:section];
       if (sectionIndex == NSNotFound) {
-         SFAssert(0, @"sectionIndex is not found!");
+         NSAssert(0, @"sectionIndex is not found!");
          return;
       }
       
@@ -197,7 +197,7 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 
 
 - (void)insertSection:(NSObject<SFCCollectionSection> *)section atIndex:(NSUInteger)index {
-   SFAssert(section, @"Section is required!");
+   NSAssert(section, @"Section is required!");
    if ( ! section) {
       return;
    }

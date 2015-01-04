@@ -11,5 +11,6 @@ Pod::Spec.new do |s|
   s.source_files    = 'SFCCollections'
   s.public_header_files = 'SFCCollections/**/*.{h}'
   s.source_files = 'SFCCollections/**/*.{h,m}'
-  s.dependency 'SFCMisc', 'SFCProxyDelegate'
+  s.dependency 'SFCMisc'
+  s.dependency 'SFCProxyDelegate'
 end
