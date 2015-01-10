@@ -7,11 +7,12 @@
 //
 
 #import "SFCTableViewController.h"
-#import "SFCTableItem.h"
-#import "SFCTableViewCell.h"
 #import "NSObject+SFCSafeKVO.h"
 #import "SFCMacroses.h"
 #import "SFCProxyDelegate.h"
+#import "SFCTableHeaderItem.h"
+#import "SFCTableItem.h"
+#import "SFCTableViewCell.h"
 
 
 NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
@@ -21,6 +22,7 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 
 @property (strong, nonatomic) NSMutableArray *mutableSections;
 @property (strong, nonatomic) NSMutableDictionary *fakeCells;
+@property (strong, nonatomic) NSMutableDictionary *fakeHeaders;
 @property (strong, nonatomic) SFCProxyDelegate *dataSourceProxy;
 @property (strong, nonatomic) SFCProxyDelegate *delegateProxy;
 @property (nonatomic) UITableViewStyle tableViewStyle;
@@ -71,29 +73,6 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 }
 
 
-- (void)viewDidLayoutSubviews {
-   [super viewDidLayoutSubviews];
-
-   if ([self respondsToSelector:@selector(topLayoutGuide)]) {
-      CGFloat top = self.ignoreTopLayoutGuide ? 0 : ({
-         self.parentViewController ? self.parentViewController.topLayoutGuide.length : self.topLayoutGuide.length;
-      });
-
-      self.tableView.contentInset = ({
-         UIEdgeInsets insets = self.tableView.contentInset;
-         insets.top = top;
-         insets;
-      });
-      
-      self.tableView.scrollIndicatorInsets = ({
-         UIEdgeInsets insets = self.tableView.scrollIndicatorInsets;
-         insets.top = top;
-         insets;
-      });
-   }
-}
-
-
 - (void)viewWillAppear:(BOOL)animated {
    [super viewWillAppear:animated];
    [self.tableView reloadData];
@@ -128,7 +107,13 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
    void (^reloadSection)(NSObject<SFCCollectionSection> *) = ^ (NSObject<SFCCollectionSection> *section) {
       NSUInteger sectionIndex = [weakSelf sectionIndexOfCollectionSection:section];
       if (sectionIndex != NSNotFound) {
+         if (weakSelf.animation == UITableViewRowAnimationNone) { // See: http://stackoverflow.com/questions/15891330/uitableviewrowanimation-is-ignored
+            [CATransaction setDisableActions:YES];
+         }
          [weakSelf.tableView reloadSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:weakSelf.animation];
+         if (weakSelf.animation == UITableViewRowAnimationNone) {
+            [CATransaction setDisableActions:NO];
+         }
       }
    };
    
@@ -231,7 +216,7 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 }
 
 
-- (SFCCollectionSection *)_sectionAtIndexPath:(NSIndexPath *)indexPath {
+- (SFCCollectionSection *)sectionAtIndexPath:(NSIndexPath *)indexPath {
    if (indexPath.section < [self.mutableSections count]) {
       return self.mutableSections[indexPath.section];
    }
@@ -239,8 +224,8 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 }
 
 
-- (id)_objectAtIndexPath:(NSIndexPath *)indexPath {
-   SFCCollectionSection *section = [self _sectionAtIndexPath:indexPath];
+- (id)objectAtIndexPath:(NSIndexPath *)indexPath {
+   SFCCollectionSection *section = [self sectionAtIndexPath:indexPath];
    if (section && indexPath.row < [section.items count]) {
       return section.items[indexPath.row];
    }
@@ -248,8 +233,8 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 }
 
 
-- (SFCTableItem *)_itemAtIndexPath:(NSIndexPath *)indexPath {
-   return safe_cast(SFCTableItem, [self _objectAtIndexPath:indexPath]);
+- (SFCTableItem *)itemAtIndexPath:(NSIndexPath *)indexPath {
+   return safe_cast(SFCTableItem, [self objectAtIndexPath:indexPath]);
 }
 
 
@@ -312,10 +297,67 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 }
 
 
+- (CGFloat)_calculateHeaderHeightForHeader:(SFCTableHeaderItem *)item {
+   if (safe_cast(SFCTableHeaderItem, item) && item.viewID) {
+      if ( ! self.fakeHeaders) {
+         self.fakeHeaders = [NSMutableDictionary dictionary];
+      }
+      
+      UITableViewHeaderFooterView<SFCTableViewHeaderFooterView> *view = [self.fakeHeaders objectForKey:item.viewID];
+      if ( ! view) {
+         Class cls = [[self.tableView dequeueReusableHeaderFooterViewWithIdentifier:item.viewID] class];
+         if (cls) {
+            view = [[cls alloc] initWithReuseIdentifier:nil];
+            [self.fakeHeaders setObject:view forKey:item.viewID];
+         }
+      }
+      
+      if ([view conformsToProtocol:@protocol(SFCTableViewHeaderFooterView)]) {
+         // Set the width of the cell to match the width of the table view. This is important so that we'll get the
+         // correct cell height for different table view widths if the cell's height depends on its width (due to
+         // multi-line UILabels word wrapping, etc). We don't need to do this above in -[tableView:cellForRowAtIndexPath]
+         // because it happens automatically when the cell is used in the table view.
+         // Also note, the final width of the cell may not be the width of the table view in some cases, for example when a
+         // section index is displayed along the right side of the table view. You must account for the reduced cell width.
+         if (view.bounds.size.width != self.tableView.bounds.size.width) {
+            view.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.tableView.bounds), CGRectGetHeight(view.bounds));
+            [view setNeedsLayout];
+            [view layoutIfNeeded];
+         }
+         
+         [view prepareForReuse];
+         [view setObject:item heightCalculation:YES];
+         
+         // Make sure the constraints have been set up for this cell, since it may have just been created from scratch.
+         // Use the following lines, assuming you are setting up constraints from within the cell's updateConstraints method:
+         [view setNeedsUpdateConstraints];
+         [view updateConstraintsIfNeeded];
+         
+         // Do the layout pass on the cell, which will calculate the frames for all the views based on the constraints.
+         // (Note that you must set the preferredMaxLayoutWidth on multi-line UILabels inside the -[layoutSubviews] method
+         // of the UITableViewCell subclass, or do it manually at this point before the below 2 lines!)
+         [view setNeedsLayout];
+         [view layoutIfNeeded];
+         
+         // Let view to calculate its height
+         if ([view respondsToSelector:@selector(calculateViewHeight)]) {
+            return [view calculateViewHeight];
+         }
+         
+         // Get the actual height required for the view's contentView
+         CGFloat height = [view.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+         return height;
+      }
+   }
+   
+   return 22;
+}
+
+
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-   return [[[self _sectionAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]] items] count];
+   return [[[self sectionAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]] items] count];
 }
 
 
@@ -327,7 +369,7 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
    NSString *cellID = kDefaultCellIdentifier;
    
-   NSObject *object = [self _objectAtIndexPath:indexPath];
+   NSObject *object = [self objectAtIndexPath:indexPath];
    SFCTableItem *item = safe_cast(SFCTableItem, object);
    if (item.cellID) {
       cellID = item.cellID;
@@ -352,13 +394,28 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 }
 
 
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+   id header = [[self sectionAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]] header];
+   if ([header isKindOfClass:[SFCTableHeaderItem class]] && [header viewID]) {
+      UITableViewHeaderFooterView<SFCTableViewHeaderFooterView> *view = [tableView dequeueReusableHeaderFooterViewWithIdentifier:[header viewID]];
+      [safe_proto(SFCTableViewHeaderFooterView, view) setObject:header];
+      return view;
+   }
+   return [tableView dequeueReusableHeaderFooterViewWithIdentifier:nil];
+}
+
+
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-   return [[self _sectionAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]] header];
+   id header = [[self sectionAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]] header];
+   if ([header isKindOfClass:[SFCTableHeaderItem class]]) {
+      return nil; // title will be set to header view in -tableView:viewForHeaderInSection: method
+   }
+   return header;
 }
 
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-   return [[self _sectionAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]] footer];
+   return [[self sectionAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]] footer];
 }
 
 
@@ -366,7 +423,7 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
    if (self.isSectionTitleAutoCapitalizationEnabled) {
       if ([view isKindOfClass:[UITableViewHeaderFooterView class]]) {
          UITableViewHeaderFooterView *tableViewHeaderFooterView = (UITableViewHeaderFooterView *)view;
-         SFCCollectionSection *sectionObject = [self _sectionAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]];
+         SFCCollectionSection *sectionObject = [self sectionAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]];
          tableViewHeaderFooterView.textLabel.text = sectionObject.header;
       }
    }
@@ -374,7 +431,7 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-   SFCTableItem *item = [self _itemAtIndexPath:indexPath];
+   SFCTableItem *item = [self itemAtIndexPath:indexPath];
    if (item.actionHandler) {
       NSString *style = editingStyle == UITableViewCellEditingStyleDelete ? kTableViewCellActionDelete : @"undefined";
       UITableViewCell<SFCTableViewCell> *cell = (id)[tableView cellForRowAtIndexPath:indexPath];
@@ -388,7 +445,7 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-   SFCTableItem *item = [self _itemAtIndexPath:indexPath];
+   SFCTableItem *item = [self itemAtIndexPath:indexPath];
    if (item.willDisplayCellBlock && [cell conformsToProtocol:@protocol(SFCTableViewCell)]) {
       item.willDisplayCellBlock((UITableViewCell<SFCTableViewCell> *)cell);
    }
@@ -403,27 +460,41 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-   SFCTableItem *item = [self _itemAtIndexPath:indexPath];
+   SFCTableItem *item = [self itemAtIndexPath:indexPath];
    if (item.useOffscreenCellHeightCalculation) {
       return [self _calculateHeightOfCellForItem:item];
    }
    return item.cellHeight ? : 44;
 }
 
-// TODO: Seems like this iOS shit is a little bit buggy...
+// TODO: Seems like this iOS feature is a little bit buggy...
 //- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
-//   CGFloat height = [self _itemAtIndexPath:indexPath].estimatedCellHeight ? : UITableViewAutomaticDimension;
+//   CGFloat height = [self itemAtIndexPath:indexPath].estimatedCellHeight ? : UITableViewAutomaticDimension;
 //   return height;
 //}
 
 
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+   id header = [[self sectionAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]] header];
+   if ([header isKindOfClass:[SFCTableHeaderItem class]]) {
+      if ([header useOffscreenHeightCalculation]) {
+         return [self _calculateHeaderHeightForHeader:header];
+      }
+      if ([header viewHeight]) {
+         return [header viewHeight];
+      }
+   }
+   return (tableView.style == UITableViewStyleGrouped) ? (header ? 49 : 34) : (header ? 22 : 0); // this values could be wrong
+}
+
+
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
-   return [self _itemAtIndexPath:indexPath].editingStyle;
+   return [self itemAtIndexPath:indexPath].editingStyle;
 }
 
 
 - (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath {
-   return [self _itemAtIndexPath:indexPath].shouldIndentWhileEditing;
+   return [self itemAtIndexPath:indexPath].shouldIndentWhileEditing;
 }
 
 @end

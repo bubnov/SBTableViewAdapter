@@ -13,6 +13,7 @@
 
 @property (strong, nonatomic, readonly) id object;
 
+- (void)setObject:(id)object;
 - (void)setObject:(id)object heightCalculation:(BOOL)calculation;
 
 @optional

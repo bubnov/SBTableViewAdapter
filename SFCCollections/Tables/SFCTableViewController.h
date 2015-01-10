@@ -12,7 +12,6 @@
 
 @interface SFCTableViewController : UITableViewController
 
-@property (nonatomic) BOOL ignoreTopLayoutGuide; // NO by default
 @property (nonatomic) BOOL unselectRowWhenPressed;
 @property (nonatomic) Class tableViewClass;
 @property (nonatomic) UITableViewRowAnimation animation;
@@ -26,6 +25,8 @@
 - (void)insertSection:(NSObject<SFCCollectionSection> *)section atIndex:(NSUInteger)index;
 - (void)removeSection:(NSObject<SFCCollectionSection> *)section;
 - (void)performBatchUpdates:(void (^)(void))updates completion:(void (^)(BOOL finished))completion;
+- (SFCCollectionSection *)sectionAtIndexPath:(NSIndexPath *)indexPath;
+- (id)objectAtIndexPath:(NSIndexPath *)indexPath;
 
 @end
 

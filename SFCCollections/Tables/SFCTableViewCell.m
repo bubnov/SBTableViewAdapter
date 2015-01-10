@@ -25,8 +25,13 @@
 }
 
 
+- (void)setObject:(id)object {
+   [self setObject:object heightCalculation:NO];
+}
+
+
 - (void)setObject:(id)object heightCalculation:(BOOL)calculation {
-   self.object = object;
+   _object = object;
    
    if ([self.object isKindOfClass:[SFCTableItem class]]) {
       self.selectionStyle = [object selectionStyle];
