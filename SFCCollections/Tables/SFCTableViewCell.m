@@ -41,8 +41,6 @@
       if ([object isSeparatorInsetsOverrided]) {
          self.separatorInset = [object separatorInset];
       }
-      
-      self.editing = YES;
    }
 }
 

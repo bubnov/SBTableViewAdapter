@@ -56,16 +56,16 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
    typeof(self) __weak weakSelf = self;
    
    [self.tableView sfc_observeKeyPath:@"delegate" block:^(NSString *keyPath, id object, NSDictionary *change) {
-      if (weakSelf.tableView.delegate != self && [weakSelf.tableView.delegate class] != [SFCProxyDelegate class]) {
-         weakSelf.delegateProxy = [SFCProxyDelegate proxyDelegate:weakSelf.tableView.delegate withDelegate:self];
+      if (weakSelf.tableView.delegate != weakSelf && [weakSelf.tableView.delegate class] != [SFCProxyDelegate class]) {
+         weakSelf.delegateProxy = [SFCProxyDelegate proxyDelegate:weakSelf.tableView.delegate withDelegate:weakSelf];
          weakSelf.delegateProxy.shouldForwardAllMethods = YES;
          weakSelf.tableView.delegate = (id)weakSelf.delegateProxy;
       }
    }];
    
    [self.tableView sfc_observeKeyPath:@"dataSource" block:^(NSString *keyPath, id object, NSDictionary *change) {
-      if (weakSelf.tableView.dataSource != self && [weakSelf.tableView.dataSource class] != [SFCProxyDelegate class]) {
-         weakSelf.dataSourceProxy = [SFCProxyDelegate proxyDelegate:weakSelf.tableView.dataSource withDelegate:self];
+      if (weakSelf.tableView.dataSource != weakSelf && [weakSelf.tableView.dataSource class] != [SFCProxyDelegate class]) {
+         weakSelf.dataSourceProxy = [SFCProxyDelegate proxyDelegate:weakSelf.tableView.dataSource withDelegate:weakSelf];
          weakSelf.dataSourceProxy.shouldForwardAllMethods = YES;
          weakSelf.tableView.dataSource = (id)weakSelf.dataSourceProxy;
       }
@@ -130,7 +130,7 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
       NSIndexSet *indexes = change[@"indexes"];
       NSUInteger sectionIndex = [weakSelf sectionIndexOfCollectionSection:section];
       if (sectionIndex == NSNotFound) {
-         NSAssert(0, @"sectionIndex is not found!");
+         NSCAssert(0, @"sectionIndex is not found!");
          return;
       }
       
@@ -175,14 +175,14 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 - (void)addSections:(NSArray *)sections {
    [sections enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
       NSObject<SFCCollectionSection> *section = obj;
-      NSAssert([section conformsToProtocol:@protocol(SFCCollectionSection)], @"Section doesn't conform to SFCCollectionSection protocol. %@", section);
+      NSCAssert([section conformsToProtocol:@protocol(SFCCollectionSection)], @"Section doesn't conform to SFCCollectionSection protocol. %@", section);
       [self addSection:section];
    }];
 }
 
 
 - (void)insertSection:(NSObject<SFCCollectionSection> *)section atIndex:(NSUInteger)index {
-   NSAssert(section, @"Section is required!");
+   NSCAssert(section, @"Section is required!");
    if ( ! section) {
       return;
    }
