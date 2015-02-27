@@ -21,7 +21,7 @@
 
 - (void)prepareForReuse {
    [super prepareForReuse];
-   self.object = nil;
+   _object = nil;
 }
 
 

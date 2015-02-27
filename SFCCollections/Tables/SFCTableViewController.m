@@ -256,29 +256,15 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
       }
       
       if ([cell conformsToProtocol:@protocol(SFCTableViewCell)]) {
-         // Set the width of the cell to match the width of the table view. This is important so that we'll get the
-         // correct cell height for different table view widths if the cell's height depends on its width (due to
-         // multi-line UILabels word wrapping, etc). We don't need to do this above in -[tableView:cellForRowAtIndexPath]
-         // because it happens automatically when the cell is used in the table view.
-         // Also note, the final width of the cell may not be the width of the table view in some cases, for example when a
-         // section index is displayed along the right side of the table view. You must account for the reduced cell width.
          if (cell.bounds.size.width != self.tableView.bounds.size.width) {
             cell.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.tableView.bounds), CGRectGetHeight(cell.bounds));
             [cell setNeedsLayout];
-            [cell layoutIfNeeded];
          }
          
          [cell prepareForReuse];
          [cell setObject:item heightCalculation:YES];
          
-         // Make sure the constraints have been set up for this cell, since it may have just been created from scratch.
-         // Use the following lines, assuming you are setting up constraints from within the cell's updateConstraints method:
          [cell setNeedsUpdateConstraints];
-         [cell updateConstraintsIfNeeded];
-         
-         // Do the layout pass on the cell, which will calculate the frames for all the views based on the constraints.
-         // (Note that you must set the preferredMaxLayoutWidth on multi-line UILabels inside the -[layoutSubviews] method
-         // of the UITableViewCell subclass, or do it manually at this point before the below 2 lines!)
          [cell setNeedsLayout];
          [cell layoutIfNeeded];
          
@@ -384,7 +370,6 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
    }
    
    [cell setNeedsUpdateConstraints];
-   [cell updateConstraintsIfNeeded];
    
    if (item.didDisplayCellBlock) {
       item.didDisplayCellBlock(cell);
