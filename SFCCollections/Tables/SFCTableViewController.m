@@ -103,6 +103,7 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 
 - (void)bindCollectionSection:(NSObject<SFCCollectionSection> *)section {
    typeof(self) __weak weakSelf = self;
+   typeof(section) __weak weakSection = section;
    
    void (^reloadSection)(NSObject<SFCCollectionSection> *) = ^ (NSObject<SFCCollectionSection> *section) {
       NSUInteger sectionIndex = [weakSelf sectionIndexOfCollectionSection:section];
@@ -128,7 +129,7 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
    [section sfc_observeKeyPath:@"items" block:^(NSString *keyPath, id object, NSDictionary *change) {
       NSKeyValueChange kind = [change[@"kind"] unsignedIntegerValue];
       NSIndexSet *indexes = change[@"indexes"];
-      NSUInteger sectionIndex = [weakSelf sectionIndexOfCollectionSection:section];
+      NSUInteger sectionIndex = [weakSelf sectionIndexOfCollectionSection:weakSection];
       if (sectionIndex == NSNotFound) {
          NSCAssert(0, @"sectionIndex is not found!");
          return;
@@ -173,10 +174,11 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 
 
 - (void)addSections:(NSArray *)sections {
+   typeof(self) __weak weakSelf = self;
    [sections enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
       NSObject<SFCCollectionSection> *section = obj;
       NSCAssert([section conformsToProtocol:@protocol(SFCCollectionSection)], @"Section doesn't conform to SFCCollectionSection protocol. %@", section);
-      [self addSection:section];
+      [weakSelf addSection:section];
    }];
 }
 
