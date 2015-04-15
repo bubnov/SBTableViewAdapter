@@ -79,6 +79,29 @@ NSString * const kDefaultCellIdentifier = @"kDefaultCellIdentifier";
 }
 
 
+- (void)viewDidLayoutSubviews {
+   [super viewDidLayoutSubviews];
+   
+   if ([self respondsToSelector:@selector(topLayoutGuide)]) {
+      CGFloat top = self.ignoreTopLayoutGuide ? 0 : ({
+         self.parentViewController ? self.parentViewController.topLayoutGuide.length : self.topLayoutGuide.length;
+      });
+      
+      self.tableView.contentInset = ({
+         UIEdgeInsets insets = self.tableView.contentInset;
+         insets.top = top;
+         insets;
+      });
+      
+      self.tableView.scrollIndicatorInsets = ({
+         UIEdgeInsets insets = self.tableView.scrollIndicatorInsets;
+         insets.top = top;
+         insets;
+      });
+   }
+}
+
+
 - (void)addSection:(NSObject<SFCCollectionSection> *)section {
    if ( ! section) {
       return;

@@ -12,6 +12,7 @@
 
 @interface SFCTableViewController : UITableViewController
 
+@property (nonatomic) BOOL ignoreTopLayoutGuide; // NO by default
 @property (nonatomic) BOOL unselectRowWhenPressed;
 @property (nonatomic) Class tableViewClass;
 @property (nonatomic) UITableViewRowAnimation animation;
