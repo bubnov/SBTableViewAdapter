@@ -9,27 +9,27 @@
 import Foundation
 
 
-protocol AbstractMapper {
+public protocol AbstractMapper {
     var id: String? { get }
     var targetClass: AnyClass { get }
     @discardableResult func apply<V, T>(_ value: V?, to target: T) -> T
 }
 
 
-class Mapper<Value, Target: AnyObject>: AbstractMapper {
+public class Mapper<Value, Target: AnyObject>: AbstractMapper {
     
-    typealias Closure = (_ value: Value?, _ target: Target) -> Void
+    public typealias Closure = (_ value: Value?, _ target: Target) -> Void
     
-    var id: String?
-    var targetClass: AnyClass = Target.self
+    public var id: String?
+    public var targetClass: AnyClass = Target.self
     private var _closure: Closure?
     
-    init(id: String? = nil, closure: @escaping Closure) {
+    public init(id: String? = nil, closure: @escaping Closure) {
         self.id = id ?? "\(Value.self)"
         _closure = closure
     }
     
-    func apply<V, T>(_ value: V?, to target: T) -> T {
+    public func apply<V, T>(_ value: V?, to target: T) -> T {
         if let closure = _closure {
             closure(value as? Value, target as! Target)
         }

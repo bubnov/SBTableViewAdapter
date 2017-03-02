@@ -9,16 +9,16 @@
 import Foundation
 
 
-class Section: CollectionSectionType {
+public class Section: CollectionSectionType {
     
-    var header: CollectionItemType?
-    var footer: CollectionItemType?
-    var items: [CollectionItemType]?
-    var index: String?
-    var mappers: [AbstractMapper] = []
-    var selectionHandler: ((CollectionItemType) -> Void)?
+    public var header: CollectionItemType?
+    public var footer: CollectionItemType?
+    public var items: [CollectionItemType]?
+    public var index: String?
+    public var mappers: [AbstractMapper] = []
+    public var selectionHandler: ((CollectionItemType) -> Void)?
     
-    init(header: Any? = nil, footer: Any? = nil, index: String? = nil, items: [Any], mappers: [AbstractMapper]? = nil) {
+    public init(header: Any? = nil, footer: Any? = nil, index: String? = nil, items: [Any], mappers: [AbstractMapper]? = nil) {
         self.header = _convertObjectToItem(header, id: "header")
         self.footer = _convertObjectToItem(footer, id: "footer")
         self.index = index
@@ -35,7 +35,7 @@ class Section: CollectionSectionType {
         }
     }
     
-    convenience init(_ items: Any...) {
+    public convenience init(_ items: Any...) {
         self.init(items: items)
     }
     

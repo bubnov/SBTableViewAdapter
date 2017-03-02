@@ -9,15 +9,15 @@
 import UIKit
 
 
-class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDelegate, CollectionViewAdapterType {
+public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDelegate, CollectionViewAdapterType {
     
     //MARK: - Public
     
-    var sections: [CollectionSectionType] = []
-    var mappers: [AbstractMapper] = []
-    var selectionHandler: ((CollectionItemType) -> Void)?
+    public var sections: [CollectionSectionType] = []
+    public var mappers: [AbstractMapper] = []
+    public var selectionHandler: ((CollectionItemType) -> Void)?
     
-    func assign(to view: UIView) {
+    public func assign(to view: UIView) {
         guard let view = view as? UITableView else { fatalError("UITableView is expected") }
         
         tableView = view
@@ -166,15 +166,15 @@ class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDelegate, Co
     
     // MARK: - UITableViewDataSource
     
-    func numberOfSections(in tableView: UITableView) -> Int {
+    public func numberOfSections(in tableView: UITableView) -> Int {
         return sections.count
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return _section(atIndex: section)?.items?.count ?? 0
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let item = _item(atIndexPath: indexPath as IndexPath) {
             if let cell = tableView.dequeueReusableCell(withIdentifier: item.id) {
                 item.mapper?.apply(item.value, to: cell)
@@ -184,7 +184,7 @@ class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDelegate, Co
         return UITableViewCell()
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if let header = _header(atIndex: section) {
             if let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: header.id) as? TableViewHeaderFooterView {
                 headerView.isFirst = (section == 0)
@@ -196,7 +196,7 @@ class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDelegate, Co
         return UITableViewHeaderFooterView()
     }
     
-    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         if let footer = _footer(atIndex: section) {
             if let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: footer.id) as? TableViewHeaderFooterView {
                 footerView.isFooter = true
@@ -208,7 +208,7 @@ class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDelegate, Co
         return UITableViewHeaderFooterView()
     }
     
-    func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+    public func sectionIndexTitles(for tableView: UITableView) -> [String]? {
         var titles: [String] = []
         for section in sections {
             if let index = section.index {
@@ -220,7 +220,7 @@ class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDelegate, Co
     
     // MARK: - UITableViewDelegate
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath as IndexPath, animated: true)
         
         guard let item = _item(atIndexPath: indexPath as IndexPath) else { return }
@@ -239,14 +239,14 @@ class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDelegate, Co
         selectionHandler?(item)
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         guard _header(atIndex: section) != nil else {
             return tableView.style == .plain ? 0 : 35
         }
         return tableView.sectionHeaderHeight
     }
     
-    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         guard _footer(atIndex: section) != nil else { return 0 }
         return tableView.sectionFooterHeight
     }

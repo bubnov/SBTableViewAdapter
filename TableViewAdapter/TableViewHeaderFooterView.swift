@@ -9,7 +9,7 @@
 import UIKit
 
 
-class TableViewHeaderFooterView: UITableViewHeaderFooterView {
+public class TableViewHeaderFooterView: UITableViewHeaderFooterView {
 
     lazy var label = UILabel()
     var isFooter = false
@@ -25,11 +25,11 @@ class TableViewHeaderFooterView: UITableViewHeaderFooterView {
         setNeedsUpdateConstraints()
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
     
-    override func didMoveToSuperview() {
+    override public func didMoveToSuperview() {
         super.didMoveToSuperview()
         
         if let tableView = superview as? UITableView {
@@ -44,7 +44,7 @@ class TableViewHeaderFooterView: UITableViewHeaderFooterView {
         }
     }
     
-    override func updateConstraints() {
+    override public func updateConstraints() {
         if label.superview != contentView {
             contentView.addSubview(label)
             
@@ -72,7 +72,7 @@ class TableViewHeaderFooterView: UITableViewHeaderFooterView {
         super.updateConstraints()
     }
     
-    override func systemLayoutSizeFitting(
+    override public func systemLayoutSizeFitting(
         _ targetSize: CGSize,
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
         verticalFittingPriority: UILayoutPriority) -> CGSize

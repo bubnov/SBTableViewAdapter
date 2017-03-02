@@ -9,10 +9,10 @@
 import Foundation
 
 
-class Item: ValueContainer, CollectionItemType {
+public class Item: ValueContainer, CollectionItemType {
     
     private var _id: String?
-    var id: String {
+    public var id: String {
         if _id == nil {
             if let value = value {
                 let id = "\(Mirror(reflecting: value).subjectType)"
@@ -24,22 +24,22 @@ class Item: ValueContainer, CollectionItemType {
         }
         return _id!
     }
-    var mapper: AbstractMapper?
-    var selectionHandler: ((CollectionItemType) -> Void)?
+    public var mapper: AbstractMapper?
+    public var selectionHandler: ((CollectionItemType) -> Void)?
     
-    init(id: String? = nil, value: Any, mapper: AbstractMapper? = nil) {
+    public init(id: String? = nil, value: Any, mapper: AbstractMapper? = nil) {
         super.init(value: value)
         _id = id
         self.mapper = mapper
     }
     
-    init(id: String? = nil, mapper: AbstractMapper? = nil, dynamicValue: @escaping DynamicValueClosure) {
+    public init(id: String? = nil, mapper: AbstractMapper? = nil, dynamicValue: @escaping DynamicValueClosure) {
         super.init(closure: dynamicValue)
         _id = id
         self.mapper = mapper
     }
     
-    init(id: String, mapper: AbstractMapper? = nil) {
+    public init(id: String, mapper: AbstractMapper? = nil) {
         super.init(value: nil)
         _id = id
         self.mapper = mapper
