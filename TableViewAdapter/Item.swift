@@ -15,7 +15,10 @@ public class Item: ValueContainer, CollectionItemType {
     public var id: String {
         if _id == nil {
             if let value = value {
-                let id = "\(Mirror(reflecting: value).subjectType)"
+                var id = "\(Mirror(reflecting: value).subjectType)"
+                if mapper != nil {
+                    id += "_\(mapper!.targetClass)"
+                }
                 if isDynamic {
                     return id
                 }
