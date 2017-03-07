@@ -52,7 +52,7 @@ public class TableViewHeaderFooterView: UITableViewHeaderFooterView {
             switch tableView?.style ?? .plain {
             case .grouped:
                 metrics = [
-                    "topInset": isFooter ? 13 : (isFirst ? 32 : 16),
+                    "topInset": isFooter ? 8 : (isFirst ? 32 : 16),
                     "bottomInset": isFooter ? 13 : 8
                 ]
             case .plain:

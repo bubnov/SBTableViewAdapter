@@ -272,7 +272,11 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         guard _header(atIndex: section) != nil else {
-            return tableView.style == .plain ? 0 : 35
+            guard tableView.style == .grouped else { return 0 }
+            if section > 0, _footer(atIndex: section - 1) != nil {
+                return 16
+            }
+            return 35
         }
         return tableView.sectionHeaderHeight
     }
