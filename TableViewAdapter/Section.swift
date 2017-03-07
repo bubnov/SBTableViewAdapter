@@ -9,14 +9,32 @@
 import Foundation
 
 
-public class Section: CollectionSectionType {
+public class Section: CollectionSectionType, ReloadableSectionType, InternalCollectionSectionType {
     
-    public var header: CollectionItemType?
-    public var footer: CollectionItemType?
-    public var items: [CollectionItemType]?
+    internal var _index: Int?
+    internal weak var _adapter: ReloadableAdapterType?
+    
     public var index: String?
     public var mappers: [AbstractMapper] = []
     public var selectionHandler: ((CollectionItemType) -> Void)?
+    public var header: CollectionItemType?
+    public var footer: CollectionItemType?
+    public var items: [CollectionItemType]? {
+        willSet {
+            for item in items ?? [] {
+                guard let item = item as? InternalCollectionItemType else { continue }
+                item._index = nil
+                item._section = nil
+            }
+        }
+        didSet {
+            for (i, item) in (items ?? []).enumerated() {
+                guard let item = item as? InternalCollectionItemType else { continue }
+                item._index = i
+                item._section = self
+            }
+        }
+    }
     
     public init(header: Any? = nil, footer: Any? = nil, index: String? = nil, items: [Any], mappers: [AbstractMapper]? = nil) {
         self.header = _convertObjectToItem(header, id: "header")
@@ -39,6 +57,11 @@ public class Section: CollectionSectionType {
         self.init(items: items)
     }
     
+    public func reload(with animation: UITableViewRowAnimation? = nil) {
+        guard let index = _index else { return }
+        _adapter?.reloadSection(at: index, animation: animation)
+    }
+    
     private func _convertObjectToItem(_ object: Any?, id: String? = nil) -> CollectionItemType? {
         guard object != nil else { return nil }
         if object is CollectionItemType {
@@ -47,5 +70,10 @@ public class Section: CollectionSectionType {
         }
         let itemId = id ?? "\(Mirror(reflecting: object!).subjectType)"
         return Item(id: "\(itemId)", value: object!)
+    }
+    
+    internal func reloadItem(at index: Int, animation: UITableViewRowAnimation? = nil) {
+        guard let section = _index else { return }
+        _adapter?.reloadItem(at: index, section: section, animation: animation)
     }
 }

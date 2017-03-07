@@ -9,11 +9,26 @@
 import UIKit
 
 
-public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDelegate, CollectionViewAdapterType {
+public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDelegate, CollectionViewAdapterType, ReloadableAdapterType {
     
     //MARK: - Public
     
-    public var sections: [CollectionSectionType] = []
+    public var sections: [CollectionSectionType] = [] {
+        willSet {
+            for section in sections {
+                guard let section = section as? InternalCollectionSectionType else { continue }
+                section._index = nil
+                section._adapter = nil
+            }
+        }
+        didSet {
+            for (i, section) in sections.enumerated() {
+                guard let section = section as? InternalCollectionSectionType else { continue }
+                section._index = i
+                section._adapter = self
+            }
+        }
+    }
     public var mappers: [AbstractMapper] = []
     public var selectionHandler: ((CollectionItemType) -> Void)?
     
@@ -37,6 +52,22 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
             NSIndexSet(indexesIn: NSMakeRange(0, view.dataSource!.numberOfSections!(in: view))) as IndexSet,
             with: .automatic
         )
+    }
+    
+    //MARK: - ReloadableAdapterType
+    
+    internal func reloadItem(at index: Int, section: Int, animation: UITableViewRowAnimation? = nil) {
+        guard let tableView = tableView, section < tableView.numberOfSections, index < tableView.numberOfRows(inSection: section) else { return }
+        tableView.beginUpdates()
+        tableView.reloadRows(at: [IndexPath(row: index, section: section)], with: animation ?? .automatic)
+        tableView.endUpdates()
+    }
+    
+    internal func reloadSection(at index: Int, animation: UITableViewRowAnimation? = nil) {
+        guard let tableView = tableView, index < tableView.numberOfSections else { return }
+        tableView.beginUpdates()
+        tableView.reloadSections(IndexSet(integer: index), with: animation ?? .automatic)
+        tableView.endUpdates()
     }
     
     //MARK: - Private

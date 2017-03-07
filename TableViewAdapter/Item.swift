@@ -9,7 +9,10 @@
 import Foundation
 
 
-public class Item: ValueContainer, CollectionItemType {
+public class Item: ValueContainer, CollectionItemType, InternalCollectionItemType {
+    
+    internal var _index: Int?
+    internal weak var _section: ReloadableSectionType?
     
     private var _id: String?
     public var id: String {
@@ -46,5 +49,10 @@ public class Item: ValueContainer, CollectionItemType {
         super.init(value: nil)
         _id = id
         self.mapper = mapper
+    }
+    
+    public func reload(with animation: UITableViewRowAnimation? = nil) {
+        guard let index = _index else { return }
+        _section?.reloadItem(at: index, animation: animation)
     }
 }
