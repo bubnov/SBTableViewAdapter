@@ -202,7 +202,8 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return _section(atIndex: section)?.items?.count ?? 0
+        guard let section = _section(atIndex: section), !section.isHidden else { return 0 }
+        return section.items?.count ?? 0
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -216,7 +217,7 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     }
     
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        if let header = _header(atIndex: section) {
+        if let header = _header(atIndex: section), _section(atIndex: section)?.isHidden != true {
             if let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: header.id) as? TableViewHeaderFooterView {
                 headerView.isFirst = (section == 0)
                 headerView.tableView = tableView
@@ -228,7 +229,7 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     }
     
     public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        if let footer = _footer(atIndex: section) {
+        if let footer = _footer(atIndex: section), _section(atIndex: section)?.isHidden != true {
             if let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: footer.id) as? TableViewHeaderFooterView {
                 footerView.isFooter = true
                 footerView.tableView = tableView

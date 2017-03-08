@@ -63,7 +63,7 @@ public class TableViewHeaderFooterView: UITableViewHeaderFooterView {
             }
             
             contentView.addConstraints(
-                ["|-[label]-|", "V:|-(topInset@250)-[label]-(bottomInset@250)-|"],
+                ["|-[label]-(8@999)-|", "V:|-(topInset@250)-[label]-(bottomInset@250)-|"],
                 views: ["label": label],
                 metrics: metrics
             )

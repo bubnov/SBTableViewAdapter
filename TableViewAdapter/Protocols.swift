@@ -33,6 +33,7 @@ public protocol CollectionSectionType: class, SelectionHandlerType, CollectionRe
     var items: [CollectionItemType]? { get set }
     var mappers: [AbstractMapper] { get set }
     var index: String? { get set }
+    var isHidden: Bool { get set }
 }
 
 

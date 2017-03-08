@@ -14,6 +14,7 @@ public class Section: CollectionSectionType, ReloadableSectionType, InternalColl
     internal var _index: Int?
     internal weak var _adapter: ReloadableAdapterType?
     
+    public var isHidden: Bool = false
     public var index: String?
     public var mappers: [AbstractMapper] = []
     public var selectionHandler: ((CollectionItemType) -> Void)?
