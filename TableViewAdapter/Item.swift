@@ -32,6 +32,11 @@ public class Item: ValueContainer, CollectionItemType, InternalCollectionItemTyp
     }
     public var mapper: AbstractMapper?
     public var selectionHandler: ((CollectionItemType) -> Void)?
+    public var editable: Bool = true
+    public var editingStyle: UITableViewCellEditingStyle = .none
+    public var titleForDeleteConfirmationButton: String?
+    public var editActions: [UITableViewRowAction]?
+    public var commitEditingStyle: ((UITableViewCellEditingStyle, CollectionItemType) -> Void)?
     
     public init(id: String? = nil, value: Any, mapper: AbstractMapper? = nil) {
         super.init(value: value)

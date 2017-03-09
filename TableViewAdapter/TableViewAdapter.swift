@@ -250,6 +250,15 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
         return titles
     }
     
+    public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return _item(atIndexPath: indexPath as IndexPath)?.editable ?? true
+    }
+    
+    public func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        guard let item = _item(atIndexPath: indexPath as IndexPath) else { return }
+        item.commitEditingStyle?(editingStyle, item)
+    }
+    
     // MARK: - UITableViewDelegate
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -285,5 +294,17 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         guard _footer(atIndex: section) != nil else { return 0 }
         return tableView.sectionFooterHeight
+    }
+    
+    public func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
+        return _item(atIndexPath: indexPath as IndexPath)?.editingStyle ?? .none
+    }
+    
+    public func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
+        return _item(atIndexPath: indexPath as IndexPath)?.titleForDeleteConfirmationButton
+    }
+    
+    public func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        return _item(atIndexPath: indexPath as IndexPath)?.editActions
     }
 }
