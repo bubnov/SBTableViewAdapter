@@ -79,7 +79,7 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     }
     
     private func _section(atIndex index: Int) -> CollectionSectionType? {
-        guard index < sections.count else { return nil }
+        guard case 0..<sections.count = index else { return nil }
         return sections[index]
     }
     
@@ -284,17 +284,20 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
         guard _section(atIndex: section)?.isHidden != true else { return 0 }
         guard _header(atIndex: section) != nil else {
             guard tableView.style == .grouped else { return 0 }
-            if section > 0, _footer(atIndex: section - 1) != nil {
-                return 16
-            }
-            return 35
+            guard _section(atIndex: section - 1)?.footer != nil else { return 35 }
+            return 16
         }
         return tableView.sectionHeaderHeight
     }
     
     public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         guard _section(atIndex: section)?.isHidden != true else { return 0 }
-        guard _footer(atIndex: section) != nil else { return 0 }
+        guard _footer(atIndex: section) != nil else {
+            guard tableView.style == .grouped else { return 0 }
+            guard let nextSection = _section(atIndex: section + 1) else { return 16 }
+            guard nextSection.header != nil else { return 0 }
+            return 16
+        }
         return tableView.sectionFooterHeight
     }
     
