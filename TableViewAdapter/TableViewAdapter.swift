@@ -281,6 +281,7 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     }
     
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        guard _section(atIndex: section)?.isHidden != true else { return 0 }
         guard _header(atIndex: section) != nil else {
             guard tableView.style == .grouped else { return 0 }
             if section > 0, _footer(atIndex: section - 1) != nil {
@@ -292,6 +293,7 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     }
     
     public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        guard _section(atIndex: section)?.isHidden != true else { return 0 }
         guard _footer(atIndex: section) != nil else { return 0 }
         return tableView.sectionFooterHeight
     }
