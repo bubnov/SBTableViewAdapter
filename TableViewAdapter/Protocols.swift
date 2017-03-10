@@ -52,6 +52,12 @@ public extension CollectionReloadableType {
     }
 }
 
+public protocol TableViewHeaderFooterViewType {
+    var isFooter: Bool { get set }
+    var isFirst: Bool { get set }
+    var tableViewStyle: UITableViewStyle { get set }
+}
+
 internal protocol InternalCollectionItemType: class {
     var _index: Int? { get set }
     weak var _section: ReloadableSectionType? { get set }

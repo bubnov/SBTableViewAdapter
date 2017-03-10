@@ -218,9 +218,11 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if let header = _header(atIndex: section), _section(atIndex: section)?.isHidden != true {
-            if let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: header.id) as? TableViewHeaderFooterView {
-                headerView.isFirst = (section == 0)
-                headerView.tableView = tableView
+            if let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: header.id) {
+                if var headerViewType = headerView as? TableViewHeaderFooterViewType {
+                    headerViewType.isFirst = (section == 0)
+                    headerViewType.tableViewStyle = tableView.style
+                }
                 header.mapper?.apply(header.value, to: headerView)
                 return headerView
             }
@@ -230,9 +232,11 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     
     public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         if let footer = _footer(atIndex: section), _section(atIndex: section)?.isHidden != true {
-            if let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: footer.id) as? TableViewHeaderFooterView {
-                footerView.isFooter = true
-                footerView.tableView = tableView
+            if let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: footer.id) {
+                if var footerViewType = footerView as? TableViewHeaderFooterViewType {
+                    footerViewType.isFooter = true
+                    footerViewType.tableViewStyle = tableView.style
+                }
                 footer.mapper?.apply(footer.value, to: footerView)
                 return footerView
             }

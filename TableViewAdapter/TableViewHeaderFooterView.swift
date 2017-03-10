@@ -9,12 +9,12 @@
 import UIKit
 
 
-public class TableViewHeaderFooterView: UITableViewHeaderFooterView {
+public class TableViewHeaderFooterView: UITableViewHeaderFooterView, TableViewHeaderFooterViewType {
 
     lazy var label = UILabel()
-    var isFooter = false
-    var isFirst = false
-    weak var tableView: UITableView?
+    public var isFooter = false
+    public var isFirst = false
+    public var tableViewStyle: UITableViewStyle = .plain
     
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
@@ -49,7 +49,7 @@ public class TableViewHeaderFooterView: UITableViewHeaderFooterView {
             contentView.addSubview(label)
             
             var metrics: [String: Any]?
-            switch tableView?.style ?? .plain {
+            switch tableViewStyle {
             case .grouped:
                 metrics = [
                     "topInset": isFooter ? 8 : (isFirst ? 32 : 16),
