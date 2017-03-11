@@ -79,7 +79,7 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     }
     
     private func _section(atIndex index: Int) -> CollectionSectionType? {
-        guard case 0..<sections.count = index else { return nil }
+        guard (0..<sections.count).contains(index) else { return nil }
         return sections[index]
     }
     

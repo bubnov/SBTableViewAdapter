@@ -15,12 +15,15 @@ public class TableViewHeaderFooterView: UITableViewHeaderFooterView, TableViewHe
     public var isFooter = false
     public var isFirst = false
     public var tableViewStyle: UITableViewStyle = .plain
+    private var contentViewConstraints: [NSLayoutConstraint]?
     
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
         
         label.font = UIFont.systemFont(ofSize: 13)
         label.numberOfLines = 0
+        
+        contentView.addSubview(label)
         
         setNeedsUpdateConstraints()
     }
@@ -36,38 +39,38 @@ public class TableViewHeaderFooterView: UITableViewHeaderFooterView, TableViewHe
             switch tableView.style {
             case .plain:
                 contentView.backgroundColor = UIColor(white: 0.97, alpha: 1)
+                label.textColor = UIColor(white: 0.13, alpha: 1)
             case .grouped:
                 contentView.backgroundColor = UIColor.clear
+                label.textColor = UIColor(white: 0.43, alpha: 1)
             }
-            
-            label.textColor = textLabel?.textColor
         }
     }
     
     override public func updateConstraints() {
-        if label.superview != contentView {
-            contentView.addSubview(label)
-            
-            var metrics: [String: Any]?
-            switch tableViewStyle {
-            case .grouped:
-                metrics = [
-                    "topInset": isFooter ? 8 : (isFirst ? 32 : 16),
-                    "bottomInset": isFooter ? 13 : 8
-                ]
-            case .plain:
-                metrics = [
-                    "topInset": 4,
-                    "bottomInset": 3
-                ]
-            }
-            
-            contentView.addConstraints(
-                ["|-[label]-(8@999)-|", "V:|-(topInset@250)-[label]-(bottomInset@250)-|"],
-                views: ["label": label],
-                metrics: metrics
-            )
+        if let oldConstraints = contentViewConstraints {
+            contentView.removeConstraints(oldConstraints)
         }
+        
+        var metrics: [String: Any]?
+        switch tableViewStyle {
+        case .grouped:
+            metrics = [
+                "topInset": isFooter ? 8 : (isFirst ? 32 : 16),
+                "bottomInset": isFooter ? 13 : 8
+            ]
+        case .plain:
+            metrics = [
+                "topInset": 4,
+                "bottomInset": 3
+            ]
+        }
+        
+        contentViewConstraints = contentView.addConstraints(
+            ["|-[label]-(8@999)-|", "V:|-(topInset@250)-[label]-(bottomInset@250)-|"],
+            views: ["label": label],
+            metrics: metrics
+        )
         
         super.updateConstraints()
     }
