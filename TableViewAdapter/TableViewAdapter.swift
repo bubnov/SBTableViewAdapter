@@ -31,6 +31,7 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     }
     public var mappers: [AbstractMapper] = []
     public var selectionHandler: ((CollectionItemType) -> Void)?
+    public var accessoryButtonHandler: ((CollectionItemType) -> Void)?
     
     public func assign(to view: UIView) {
         guard let view = view as? UITableView else { fatalError("UITableView is expected") }
@@ -282,6 +283,23 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
         }
         
         selectionHandler?(item)
+    }
+    
+    public func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        guard let item = _item(atIndexPath: indexPath as IndexPath) else { return }
+        
+        if let handler = item.accessoryButtonHandler {
+            handler(item)
+            return
+        }
+        
+        if let section = _section(atIndex: indexPath.section),
+            let handler = section.accessoryButtonHandler {
+            handler(item)
+            return
+        }
+        
+        accessoryButtonHandler?(item)
     }
     
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {

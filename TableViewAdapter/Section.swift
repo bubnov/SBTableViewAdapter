@@ -18,6 +18,7 @@ public class Section: CollectionSectionType, ReloadableSectionType, InternalColl
     public var index: String?
     public var mappers: [AbstractMapper] = []
     public var selectionHandler: ((CollectionItemType) -> Void)?
+    public var accessoryButtonHandler: ((CollectionItemType) -> Void)?
     public var header: CollectionItemType?
     public var footer: CollectionItemType?
     public var items: [CollectionItemType]? {

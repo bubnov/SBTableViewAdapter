@@ -32,6 +32,7 @@ public class Item: ValueContainer, CollectionItemType, InternalCollectionItemTyp
     }
     public var mapper: AbstractMapper?
     public var selectionHandler: ((CollectionItemType) -> Void)?
+    public var accessoryButtonHandler: ((CollectionItemType) -> Void)?
     public var editable: Bool = true
     public var editingStyle: UITableViewCellEditingStyle = .none
     public var titleForDeleteConfirmationButton: String?

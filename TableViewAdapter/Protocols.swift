@@ -9,8 +9,9 @@
 import UIKit
 
 
-public protocol SelectionHandlerType {
+public protocol ActionHandlerType {
     var selectionHandler: ((CollectionItemType) -> Void)? { get set }
+    var accessoryButtonHandler: ((CollectionItemType) -> Void)? { get set }
 }
 
 public protocol EditableItemType {
@@ -21,18 +22,18 @@ public protocol EditableItemType {
     var commitEditingStyle: ((UITableViewCellEditingStyle, CollectionItemType) -> Void)? { get set }
 }
 
-public protocol CollectionViewAdapterType: class, SelectionHandlerType {
+public protocol CollectionViewAdapterType: class, ActionHandlerType {
     func assign(to view: UIView)
     var mappers: [AbstractMapper] { get set }
     var sections: [CollectionSectionType] { get set }
 }
 
-public protocol CollectionItemType: ValueContainerType, SelectionHandlerType, CollectionReloadableType, EditableItemType {
+public protocol CollectionItemType: ValueContainerType, ActionHandlerType, CollectionReloadableType, EditableItemType {
     var id: String { get }
     var mapper: AbstractMapper? { get set }
 }
 
-public protocol CollectionSectionType: class, SelectionHandlerType, CollectionReloadableType {
+public protocol CollectionSectionType: class, ActionHandlerType, CollectionReloadableType {
     var header: CollectionItemType? { get set }
     var footer: CollectionItemType? { get set }
     var items: [CollectionItemType]? { get set }
