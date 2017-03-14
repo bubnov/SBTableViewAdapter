@@ -37,6 +37,8 @@ public class Section: CollectionSectionType, ReloadableSectionType, InternalColl
             }
         }
     }
+    public var dynamicItemCount: Int?
+    public var dynamicItemMapper: AbstractMapper?
     
     public init(header: Any? = nil, footer: Any? = nil, index: String? = nil, items: [Any], mappers: [AbstractMapper]? = nil) {
         self.header = _convertObjectToItem(header, id: "header")

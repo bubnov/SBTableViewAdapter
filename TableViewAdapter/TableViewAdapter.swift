@@ -99,11 +99,14 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     private func _item(atIndexPath indexPath: IndexPath, viewType: ViewType? = .Item) -> CollectionItemType? {
         guard let section = _section(atIndexPath: indexPath) else { return nil }
         
-        let item: CollectionItemType?
+        var item: CollectionItemType?
         switch viewType! {
         case .Item:
-            guard indexPath.item < section.items?.count ?? 0 else { return nil }
-            item = section.items?[indexPath.item]
+            if indexPath.item < section.items?.count ?? 0 {
+                item = section.items?[indexPath.item]
+            } else if section.dynamicItemMapper != nil {
+                item = Item(value: indexPath.row, mapper: section.dynamicItemMapper)
+            }
         case .Header:
             item = section.header
         case .Footer:
@@ -204,7 +207,7 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let section = _section(atIndex: section), !section.isHidden else { return 0 }
-        return section.items?.count ?? 0
+        return section.dynamicItemCount ?? section.items?.count ?? 0
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

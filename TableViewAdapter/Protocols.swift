@@ -9,7 +9,7 @@
 import UIKit
 
 
-public protocol ActionHandlerType {
+public protocol ActionHandlerType: class {
     var selectionHandler: ((CollectionItemType) -> Void)? { get set }
     var accessoryButtonHandler: ((CollectionItemType) -> Void)? { get set }
 }
@@ -40,6 +40,8 @@ public protocol CollectionSectionType: class, ActionHandlerType, CollectionReloa
     var mappers: [AbstractMapper] { get set }
     var index: String? { get set }
     var isHidden: Bool { get set }
+    var dynamicItemMapper: AbstractMapper? { get set }
+    var dynamicItemCount: Int? { get set }
 }
 
 public protocol CollectionReloadableType: class {
