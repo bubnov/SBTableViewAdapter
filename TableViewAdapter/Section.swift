@@ -66,6 +66,10 @@ public class Section: CollectionSectionType, ReloadableSectionType, InternalColl
         _adapter?.reloadSection(at: index, animation: animation)
     }
     
+    public func reloadAll() {
+        _adapter?.reloadAll()
+    }
+    
     private func _convertObjectToItem(_ object: Any?, id: String? = nil) -> CollectionItemType? {
         guard object != nil else { return nil }
         if object is CollectionItemType {

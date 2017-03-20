@@ -46,6 +46,7 @@ public protocol CollectionSectionType: class, ActionHandlerType, CollectionReloa
 
 public protocol CollectionReloadableType: class {
     func reload(with animation: UITableViewRowAnimation?)
+    func reloadAll()
 }
 
 public extension CollectionReloadableType {
@@ -72,10 +73,12 @@ internal protocol InternalCollectionSectionType: class {
 }
 
 internal protocol ReloadableAdapterType: class {
+    func reloadAll()
     func reloadItem(at index: Int, section: Int, animation: UITableViewRowAnimation?)
     func reloadSection(at index: Int, animation: UITableViewRowAnimation?)
 }
 
 internal protocol ReloadableSectionType: class {
+    func reloadAll()
     func reloadItem(at index: Int, animation: UITableViewRowAnimation?)
 }

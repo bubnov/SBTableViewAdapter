@@ -57,6 +57,10 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     
     //MARK: - ReloadableAdapterType
     
+    internal func reloadAll() {
+        tableView?.reloadData()
+    }
+    
     internal func reloadItem(at index: Int, section: Int, animation: UITableViewRowAnimation? = nil) {
         guard let tableView = tableView, section < tableView.numberOfSections, index < tableView.numberOfRows(inSection: section) else { return }
         tableView.beginUpdates()

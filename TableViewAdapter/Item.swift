@@ -61,4 +61,8 @@ public class Item: ValueContainer, CollectionItemType, InternalCollectionItemTyp
         guard let index = _index else { return }
         _section?.reloadItem(at: index, animation: animation)
     }
+    
+    public func reloadAll() {
+        _section?.reloadAll()
+    }
 }
