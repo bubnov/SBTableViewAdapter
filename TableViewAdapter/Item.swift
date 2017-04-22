@@ -30,6 +30,7 @@ public class Item: ValueContainer, CollectionItemType, InternalCollectionItemTyp
         }
         return _id!
     }
+    public var index: Int? { return _index }
     public var mapper: AbstractMapper?
     public var selectionHandler: ((CollectionItemType) -> Void)?
     public var accessoryButtonHandler: ((CollectionItemType) -> Void)?

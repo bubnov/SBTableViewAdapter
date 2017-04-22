@@ -13,22 +13,7 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     
     //MARK: - Public
     
-    public var sections: [CollectionSectionType] = [] {
-        willSet {
-            for section in sections {
-                guard let section = section as? InternalCollectionSectionType else { continue }
-                section._index = nil
-                section._adapter = nil
-            }
-        }
-        didSet {
-            for (i, section) in sections.enumerated() {
-                guard let section = section as? InternalCollectionSectionType else { continue }
-                section._index = i
-                section._adapter = self
-            }
-        }
-    }
+    public var sections: [CollectionSectionType] = []
     public var mappers: [AbstractMapper] = []
     public var selectionHandler: ((CollectionItemType) -> Void)?
     public var accessoryButtonHandler: ((CollectionItemType) -> Void)?
@@ -85,7 +70,12 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     
     private func _section(atIndex index: Int) -> CollectionSectionType? {
         guard (0..<sections.count).contains(index) else { return nil }
-        return sections[index]
+        let section = sections[index]
+        if let internalSection = section as? InternalCollectionSectionType {
+            internalSection._index = index
+            internalSection._adapter = self
+        }
+        return section
     }
     
     private func _section(atIndexPath indexPath: IndexPath) -> CollectionSectionType? {
@@ -118,6 +108,11 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
         }
         
         guard item != nil else { return nil }
+        
+        if let internalItem = item as? InternalCollectionItemType {
+            internalItem._index = indexPath.item
+            internalItem._section = section as? ReloadableSectionType
+        }
         
         if item!.mapper == nil {
             _ = _resolveMapperForItem(item!, section: section, viewType: viewType)
@@ -255,8 +250,8 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     public func sectionIndexTitles(for tableView: UITableView) -> [String]? {
         var titles: [String] = []
         for section in sections {
-            if let index = section.index {
-                titles.append(index)
+            if let indexTitle = section.indexTitle {
+                titles.append(indexTitle)
             }
         }
         return titles
@@ -307,6 +302,16 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
         }
         
         accessoryButtonHandler?(item)
+    }
+    
+    public func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
+        guard _section(atIndex: section)?.isHidden != true else { return 0 }
+        return tableView.estimatedSectionHeaderHeight
+    }
+    
+    public func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
+        guard _section(atIndex: section)?.isHidden != true else { return 0 }
+        return tableView.estimatedSectionFooterHeight
     }
     
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {

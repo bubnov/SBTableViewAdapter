@@ -14,44 +14,35 @@ public class Section: CollectionSectionType, ReloadableSectionType, InternalColl
     internal var _index: Int?
     internal weak var _adapter: ReloadableAdapterType?
     
+    public var index: Int? { return _index }
+    public var indexTitle: String?
     public var isHidden: Bool = false
-    public var index: String?
     public var mappers: [AbstractMapper] = []
     public var selectionHandler: ((CollectionItemType) -> Void)?
     public var accessoryButtonHandler: ((CollectionItemType) -> Void)?
     public var header: CollectionItemType?
     public var footer: CollectionItemType?
-    public var items: [CollectionItemType]? {
-        willSet {
-            for item in items ?? [] {
-                guard let item = item as? InternalCollectionItemType else { continue }
-                item._index = nil
-                item._section = nil
-            }
-        }
-        didSet {
-            for (i, item) in (items ?? []).enumerated() {
-                guard let item = item as? InternalCollectionItemType else { continue }
-                item._index = i
-                item._section = self
-            }
-        }
-    }
+    public var items: [CollectionItemType]?
     public var dynamicItemCount: Int?
     public var dynamicItemMapper: AbstractMapper?
     
     public init(header: Any? = nil, footer: Any? = nil, index: String? = nil, items: [Any], mappers: [AbstractMapper]? = nil) {
         self.header = _convertObjectToItem(header, id: "header")
         self.footer = _convertObjectToItem(footer, id: "footer")
-        self.index = index
-        for item in items {
-            if self.items == nil {
-                self.items = []
-            }
-            if let i = _convertObjectToItem(item) {
-                self.items?.append(i)
+        self.indexTitle = index
+        
+        var tempItems: [CollectionItemType] = []
+        for (i, item) in items.enumerated() {
+            if let convertedItem = _convertObjectToItem(item) {
+                tempItems.append(convertedItem)
+                if let item = convertedItem as? InternalCollectionItemType {
+                    item._index = i
+                    item._section = self
+                }
             }
         }
+        self.items = tempItems
+        
         if mappers != nil {
             self.mappers.append(contentsOf: mappers!)
         }

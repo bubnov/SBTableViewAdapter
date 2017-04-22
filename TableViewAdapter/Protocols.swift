@@ -29,16 +29,18 @@ public protocol CollectionViewAdapterType: class, ActionHandlerType {
 }
 
 public protocol CollectionItemType: ValueContainerType, ActionHandlerType, CollectionReloadableType, EditableItemType {
+    var index: Int? { get }
     var id: String { get }
     var mapper: AbstractMapper? { get set }
 }
 
 public protocol CollectionSectionType: class, ActionHandlerType, CollectionReloadableType {
+    var index: Int? { get }
+    var indexTitle: String? { get }
     var header: CollectionItemType? { get set }
     var footer: CollectionItemType? { get set }
     var items: [CollectionItemType]? { get set }
     var mappers: [AbstractMapper] { get set }
-    var index: String? { get set }
     var isHidden: Bool { get set }
     var dynamicItemMapper: AbstractMapper? { get set }
     var dynamicItemCount: Int? { get set }
