@@ -32,13 +32,9 @@ public class Section: CollectionSectionType, ReloadableSectionType, InternalColl
         self.indexTitle = index
         
         var tempItems: [CollectionItemType] = []
-        for (i, item) in items.enumerated() {
+        for item in items {
             if let convertedItem = _convertObjectToItem(item) {
                 tempItems.append(convertedItem)
-                if let item = convertedItem as? InternalCollectionItemType {
-                    item._index = i
-                    item._section = self
-                }
             }
         }
         self.items = tempItems
