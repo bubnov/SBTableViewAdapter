@@ -31,7 +31,9 @@ public class Item: ValueContainer, CollectionItemType, InternalCollectionItemTyp
         return _id!
     }
     public var index: Int? { return _index }
-    public var mapper: AbstractMapper?
+    public var mapper: AbstractMapper? {
+        didSet { _id = nil }
+    }
     public var selectionHandler: ((CollectionItemType) -> Void)?
     public var accessoryButtonHandler: ((CollectionItemType) -> Void)?
     public var editable: Bool = true
