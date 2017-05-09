@@ -223,8 +223,10 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
         if let header = _header(atIndex: section), _section(atIndex: section)?.isHidden != true {
             if let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: header.id) {
                 if var headerViewType = headerView as? TableViewHeaderFooterViewType {
+                    headerViewType.isFooter = false
                     headerViewType.isFirst = (section == 0)
                     headerViewType.tableViewStyle = tableView.style
+                    headerView.setNeedsUpdateConstraints()
                 }
                 header.mapper?.apply(header.value, to: headerView)
                 return headerView
@@ -238,7 +240,9 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
             if let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: footer.id) {
                 if var footerViewType = footerView as? TableViewHeaderFooterViewType {
                     footerViewType.isFooter = true
+                    footerViewType.isFirst = (section == 0)
                     footerViewType.tableViewStyle = tableView.style
+                    footerView.setNeedsUpdateConstraints()
                 }
                 footer.mapper?.apply(footer.value, to: footerView)
                 return footerView
