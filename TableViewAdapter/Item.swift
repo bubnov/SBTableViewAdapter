@@ -15,8 +15,10 @@ public class Item: ValueContainer, CollectionItemType, InternalCollectionItemTyp
     internal weak var _section: ReloadableSectionType?
     
     private var _id: String?
+    private var _dynamicId: String?
     public var id: String {
-        if _id == nil {
+        guard _id == nil else { return _id! }
+        if _dynamicId == nil {
             if let value = value {
                 var id = "\(Mirror(reflecting: value).subjectType)"
                 if mapper != nil {
@@ -25,14 +27,16 @@ public class Item: ValueContainer, CollectionItemType, InternalCollectionItemTyp
                 if isDynamic {
                     return id
                 }
-                _id = id
+                _dynamicId = id
             }
         }
-        return _id!
+        return _dynamicId!
     }
     public var index: Int? { return _index }
     public var mapper: AbstractMapper? {
-        didSet { _id = nil }
+        didSet {
+            _dynamicId = nil
+        }
     }
     public var selectionHandler: ((CollectionItemType) -> Void)?
     public var accessoryButtonHandler: ((CollectionItemType) -> Void)?
