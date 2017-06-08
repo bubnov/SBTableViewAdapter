@@ -48,16 +48,28 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     
     internal func reloadItem(at index: Int, section: Int, animation: UITableViewRowAnimation? = nil) {
         guard let tableView = tableView, section < tableView.numberOfSections, index < tableView.numberOfRows(inSection: section) else { return }
-        tableView.beginUpdates()
-        tableView.reloadRows(at: [IndexPath(row: index, section: section)], with: animation ?? .automatic)
-        tableView.endUpdates()
+        
+        if _UIAndDataAreDesynchronized() {
+            tableView.reloadData()
+        }
+        else {
+            tableView.beginUpdates()
+            tableView.reloadRows(at: [IndexPath(row: index, section: section)], with: animation ?? .automatic)
+            tableView.endUpdates()
+        }
     }
     
     internal func reloadSection(at index: Int, animation: UITableViewRowAnimation? = nil) {
         guard let tableView = tableView, index < tableView.numberOfSections else { return }
-        tableView.beginUpdates()
-        tableView.reloadSections(IndexSet(integer: index), with: animation ?? .automatic)
-        tableView.endUpdates()
+        
+        if _UIAndDataAreDesynchronized() {
+            tableView.reloadData()
+        }
+        else {
+            tableView.beginUpdates()
+            tableView.reloadSections(IndexSet(integer: index), with: animation ?? .automatic)
+            tableView.endUpdates()
+        }
     }
     
     //MARK: - Private
@@ -66,6 +78,16 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     private var registeredIds: [String] = []
     private enum ViewType {
         case Item, Header, Footer
+    }
+    
+    private func _UIAndDataAreDesynchronized() -> Bool {
+        guard let tableView = tableView else { return true }
+        for sectionInfo in sections.enumerated() {
+            if let items = sectionInfo.element.items, items.count != tableView.numberOfRows(inSection: sectionInfo.offset) {
+                return true
+            }
+        }
+        return false
     }
     
     private func _section(atIndex index: Int) -> CollectionSectionType? {
