@@ -9,8 +9,7 @@
 import UIKit
 
 
-public protocol TableViewPositionManagerType {
-    var logger: ((String) -> Void)? { get set }
+public protocol TableViewPositionManagerType: LoggableType {
     init(tableView: UITableView, idResolver: @escaping (IndexPath) -> String?, indexPathResolver: @escaping (String) -> IndexPath?)
     func storePosition()
     func restorePosition(animated: Bool)

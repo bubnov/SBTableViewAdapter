@@ -17,6 +17,7 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     public var mappers: [AbstractMapper] = []
     public var selectionHandler: ((CollectionItemType) -> Void)?
     public var accessoryButtonHandler: ((CollectionItemType) -> Void)?
+    public var logger: ((String) -> Void)?
     
     public func assign(to view: UIView) {
         guard let view = view as? UITableView else { fatalError("UITableView is expected") }
@@ -55,6 +56,8 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
                 return nil
             }
         )
+        
+        tableViewPositionManager.logger = logger
     }
     
     //MARK: - ReloadableAdapterType

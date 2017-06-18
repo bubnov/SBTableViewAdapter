@@ -22,7 +22,11 @@ public protocol EditableItemType {
     var commitEditingStyle: ((UITableViewCellEditingStyle, CollectionItemType) -> Void)? { get set }
 }
 
-public protocol CollectionViewAdapterType: class, ActionHandlerType {
+public protocol LoggableType {
+    var logger: ((String) -> Void)? { get set }
+}
+
+public protocol CollectionViewAdapterType: class, ActionHandlerType, LoggableType {
     func assign(to view: UIView)
     var mappers: [AbstractMapper] { get set }
     var sections: [CollectionSectionType] { get set }
