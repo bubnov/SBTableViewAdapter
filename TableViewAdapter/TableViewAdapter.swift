@@ -38,37 +38,60 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
             NSIndexSet(indexesIn: NSMakeRange(0, view.dataSource!.numberOfSections!(in: view))) as IndexSet,
             with: .automatic
         )
+        
+        tableViewPositionManager = TableViewPositionManager(
+            tableView: view,
+            idResolver: { [weak self] indexPath in
+                return self?._item(atIndexPath: indexPath)?.uid
+            },
+            indexPathResolver: { [weak self] id -> IndexPath? in
+                for section in (self?.sections ?? []).enumerated() {
+                    for item in (section.element.items ?? []).enumerated() {
+                        if item.element.uid == id {
+                            return IndexPath(row: item.offset, section: section.offset)
+                        }
+                    }
+                }
+                return nil
+            }
+        )
     }
     
     //MARK: - ReloadableAdapterType
     
     internal func reloadAll() {
-        tableView?.reloadData()
+        tableViewPositionManager.keepPosition {
+            tableView?.reloadData()
+        }
     }
     
     internal func reloadItem(at index: Int, section: Int, animation: UITableViewRowAnimation? = nil) {
         guard let tableView = tableView, section < tableView.numberOfSections, index < tableView.numberOfRows(inSection: section) else { return }
         
-        if _UIAndDataAreDesynchronized() {
-            tableView.reloadData()
-        }
-        else {
-            tableView.beginUpdates()
-            tableView.reloadRows(at: [IndexPath(row: index, section: section)], with: animation ?? .automatic)
-            tableView.endUpdates()
+        tableViewPositionManager.keepPosition {
+            if _UIAndDataAreDesynchronized() {
+                tableView.reloadData()
+            }
+            else {
+                tableView.beginUpdates()
+                tableView.reloadRows(at: [IndexPath(row: index, section: section)], with: animation ?? .automatic)
+                tableView.endUpdates()
+            }
         }
     }
     
     internal func reloadSection(at index: Int, animation: UITableViewRowAnimation? = nil) {
         guard let tableView = tableView, index < tableView.numberOfSections else { return }
         
-        if _UIAndDataAreDesynchronized() {
-            tableView.reloadData()
-        }
-        else {
-            tableView.beginUpdates()
-            tableView.reloadSections(IndexSet(integer: index), with: animation ?? .automatic)
-            tableView.endUpdates()
+        tableViewPositionManager.keepPosition {
+            if _UIAndDataAreDesynchronized() {
+                tableView.reloadData()
+            }
+            else {
+                tableView.beginUpdates()
+                tableView.reloadSections(IndexSet(integer: index), with: animation ?? .automatic)
+                tableView.endUpdates()
+            }
         }
     }
     
@@ -76,6 +99,7 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     
     private weak var tableView: UITableView?
     private var registeredIds: [String] = []
+    private var tableViewPositionManager: TableViewPositionManagerType!
     private enum ViewType {
         case Item, Header, Footer
     }

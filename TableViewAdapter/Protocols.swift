@@ -31,6 +31,7 @@ public protocol CollectionViewAdapterType: class, ActionHandlerType {
 public protocol CollectionItemType: ValueContainerType, ActionHandlerType, CollectionReloadableType, EditableItemType {
     var index: Int? { get }
     var id: String { get }
+    var uid: String { get }
     var mapper: AbstractMapper? { get set }
 }
 

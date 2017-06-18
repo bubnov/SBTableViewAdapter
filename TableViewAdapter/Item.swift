@@ -32,6 +32,7 @@ public class Item: ValueContainer, CollectionItemType, InternalCollectionItemTyp
         }
         return _dynamicId!
     }
+    public var uid = UUID().uuidString
     public var index: Int? { return _index }
     public var mapper: AbstractMapper? {
         didSet {
