@@ -20,11 +20,11 @@ public protocol TableViewPositionManagerType {
 
 extension TableViewPositionManagerType {
     
-    func restorePosition() {
+    public func restorePosition() {
         restorePosition(animated: false)
     }
     
-    func keepPosition(block: () -> Void) {
+    public func keepPosition(block: () -> Void) {
         keepPosition(animated: false, block: block)
     }
 }
