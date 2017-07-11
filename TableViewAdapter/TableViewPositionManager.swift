@@ -84,7 +84,9 @@ public class TableViewPositionManager: TableViewPositionManagerType {
             tableView.scrollToRow(at: indexPath, at: .top, animated: false)
             guard let cell = tableView.cellForRow(at: indexPath) else { continue }
             let diff = cell.frame.minY - tableView.contentOffset.y - info.cellMinY
-            tableView.setContentOffset(CGPoint(x: 0, y: tableView.contentOffset.y + diff), animated: animated)
+            if diff != 0 {
+                tableView.setContentOffset(CGPoint(x: 0, y: tableView.contentOffset.y + diff), animated: animated)
+            }
             logger?("Restored position to the cell with id \"\(info.id)\"")
             restored = true
             break
