@@ -92,7 +92,7 @@ public class TableViewPositionManager: TableViewPositionManagerType {
             
             if let tableView = tableView as? TableViewWithKeepableOffset {
                 tableView.offsetToKeep = offset
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: { [weak self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                     tableView.offsetToKeep = nil
                 })
             }
