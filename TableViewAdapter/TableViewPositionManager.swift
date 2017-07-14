@@ -83,10 +83,20 @@ public class TableViewPositionManager: TableViewPositionManagerType {
             guard indexPath.row < tableView.numberOfRows(inSection: indexPath.section) else { continue }
             tableView.scrollToRow(at: indexPath, at: .top, animated: false)
             guard let cell = tableView.cellForRow(at: indexPath) else { continue }
+            
             let diff = cell.frame.minY - tableView.contentOffset.y - info.cellMinY
+            let offset = CGPoint(x: 0, y: tableView.contentOffset.y + diff)
             if diff != 0 {
-                tableView.setContentOffset(CGPoint(x: 0, y: tableView.contentOffset.y + diff), animated: animated)
+                tableView.setContentOffset(offset, animated: animated)
             }
+            
+            if let tableView = tableView as? TableViewWithKeepableOffset {
+                tableView.offsetToKeep = offset
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: { [weak self] in
+                    tableView.offsetToKeep = nil
+                })
+            }
+            
             logger?("Restored position to the cell with id \"\(info.id)\"")
             restored = true
             break
@@ -108,5 +118,22 @@ public class TableViewPositionManager: TableViewPositionManagerType {
         block()
         UIView.setAnimationsEnabled(true)
         restorePosition(animated: animated)
+    }
+}
+
+
+class TableViewWithKeepableOffset: UITableView {
+    
+    var offsetToKeep: CGPoint?
+    
+    override var contentOffset: CGPoint {
+        get { return super.contentOffset }
+        set {
+            var newValue = newValue
+            if let offset = offsetToKeep, newValue != offset {
+                newValue = offset
+            }
+            super.contentOffset = newValue
+        }
     }
 }

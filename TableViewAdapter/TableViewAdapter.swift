@@ -70,7 +70,7 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     
     internal func reloadItem(at index: Int, section: Int, animation: UITableViewRowAnimation? = nil) {
         guard let tableView = tableView, section < tableView.numberOfSections, index < tableView.numberOfRows(inSection: section) else { return }
-        
+
         tableViewPositionManager.keepPosition {
             if _UIAndDataAreDesynchronized() {
                 tableView.reloadData()
@@ -110,7 +110,8 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     private func _UIAndDataAreDesynchronized() -> Bool {
         guard let tableView = tableView else { return true }
         for sectionInfo in sections.enumerated() {
-            if let items = sectionInfo.element.items, items.count != tableView.numberOfRows(inSection: sectionInfo.offset) {
+            let section = sectionInfo.element
+            if !section.isHidden, let items = section.items, items.count != tableView.numberOfRows(inSection: sectionInfo.offset) {
                 return true
             }
         }
