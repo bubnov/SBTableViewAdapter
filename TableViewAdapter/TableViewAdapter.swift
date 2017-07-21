@@ -110,8 +110,7 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
     private func _UIAndDataAreDesynchronized() -> Bool {
         guard let tableView = tableView else { return true }
         for sectionInfo in sections.enumerated() {
-            let section = sectionInfo.element
-            if !section.isHidden, let items = section.items, items.count != tableView.numberOfRows(inSection: sectionInfo.offset) {
+            if let items = sectionInfo.element.items, items.count != tableView.numberOfRows(inSection: sectionInfo.offset) {
                 return true
             }
         }
