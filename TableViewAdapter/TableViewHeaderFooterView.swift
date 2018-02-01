@@ -81,6 +81,7 @@ public class TableViewHeaderFooterView: UITableViewHeaderFooterView, TableViewHe
         verticalFittingPriority: UILayoutPriority) -> CGSize
     {
         guard label.text?.characters.count ?? 0 > 0 else { return CGSize(width: 0, height: 0.01) }
+        layoutIfNeeded()
         return super.systemLayoutSizeFitting(
             targetSize,
             withHorizontalFittingPriority: horizontalFittingPriority,
