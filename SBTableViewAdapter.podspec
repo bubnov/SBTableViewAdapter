@@ -8,5 +8,6 @@ Pod::Spec.new do |s|
   s.source          = { :git => "https://github.com/bubnov/SBTableViewAdapter.git", :tag => s.version.to_s }
   s.platform        = :ios, '8.0'
   s.requires_arc    = true
+  s.swift_version   = '4.0'
   s.source_files = 'TableViewAdapter/**/*.{swift}'
 end
