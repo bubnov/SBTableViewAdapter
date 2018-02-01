@@ -26,7 +26,7 @@ public protocol LoggableType {
     var logger: ((String) -> Void)? { get set }
 }
 
-public protocol CollectionViewAdapterType: class, ActionHandlerType, LoggableType {
+public protocol CollectionViewAdapterType: ActionHandlerType, LoggableType {
     func assign(to view: UIView)
     var mappers: [AbstractMapper] { get set }
     var sections: [CollectionSectionType] { get set }
@@ -39,7 +39,7 @@ public protocol CollectionItemType: ValueContainerType, ActionHandlerType, Colle
     var mapper: AbstractMapper? { get set }
 }
 
-public protocol CollectionSectionType: class, ActionHandlerType, CollectionReloadableType {
+public protocol CollectionSectionType: ActionHandlerType, CollectionReloadableType {
     var index: Int? { get }
     var indexTitle: String? { get }
     var header: CollectionItemType? { get set }
