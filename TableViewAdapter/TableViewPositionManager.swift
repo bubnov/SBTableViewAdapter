@@ -12,15 +12,15 @@ import UIKit
 public protocol TableViewPositionManagerType: LoggableType {
     init(tableView: UITableView, idResolver: @escaping (IndexPath) -> String?, indexPathResolver: @escaping (String) -> IndexPath?)
     func storePosition()
-    func restorePosition(animated: Bool)
+    @discardableResult func restorePosition(animated: Bool) -> Bool
     func reset()
     func keepPosition(animated: Bool, block: () -> Void)
 }
 
 extension TableViewPositionManagerType {
     
-    public func restorePosition() {
-        restorePosition(animated: false)
+    @discardableResult public func restorePosition() -> Bool {
+        return restorePosition(animated: false)
     }
     
     public func keepPosition(block: () -> Void) {
@@ -73,8 +73,8 @@ public class TableViewPositionManager: TableViewPositionManagerType {
         logger?("Stored positions: \(_storedCellPositions)")
     }
     
-    public func restorePosition(animated: Bool = false) {
-        guard let tableView = _tableView else { return }
+    @discardableResult public func restorePosition(animated: Bool = false) -> Bool {
+        guard let tableView = _tableView else { return false }
         
         var restored = false
         
@@ -109,6 +109,8 @@ public class TableViewPositionManager: TableViewPositionManagerType {
         }
         
         reset()
+        
+        return restored
     }
     
     public func keepPosition(animated: Bool, block: () -> Void) {
