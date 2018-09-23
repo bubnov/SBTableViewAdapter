@@ -226,17 +226,17 @@ public class TableViewAdapter: NSObject, UITableViewDataSource, UITableViewDeleg
         if resolvedMapper == nil {
             switch viewType! {
             case .Item:
-                resolvedMapper = Mapper<Any, UITableViewCell> { value, cell in
+                resolvedMapper = Mapper<AnyObject, UITableViewCell> { value, cell in
                     cell.textLabel?.text = (value != nil) ? "\(value!)" : nil
                 }
             case .Header:
-                resolvedMapper = Mapper<Any, TableViewHeaderFooterView> { value, view in
+                resolvedMapper = Mapper<AnyObject, TableViewHeaderFooterView> { value, view in
                     view.label.text = (value != nil) ? "\(value!)" : nil
                     view.setNeedsUpdateConstraints()
                     view.invalidateIntrinsicContentSize()
                 }
             case .Footer:
-                resolvedMapper = Mapper<Any, TableViewHeaderFooterView> { value, view in
+                resolvedMapper = Mapper<AnyObject, TableViewHeaderFooterView> { value, view in
                     view.label.text = (value != nil) ? "\(value!)" : nil
                 }
             }
