@@ -40,7 +40,7 @@ public class TableViewHeaderFooterView: UITableViewHeaderFooterView, TableViewHe
             case .plain:
                 contentView.backgroundColor = UIColor(white: 0.97, alpha: 1)
                 label.textColor = UIColor(white: 0.13, alpha: 1)
-            case .grouped:
+            default:
                 contentView.backgroundColor = UIColor.clear
                 label.textColor = UIColor(white: 0.43, alpha: 1)
             }
@@ -54,16 +54,17 @@ public class TableViewHeaderFooterView: UITableViewHeaderFooterView, TableViewHe
         
         var metrics: [String: Any]?
         switch tableViewStyle {
-        case .grouped:
-            metrics = [
-                "topInset": isFooter ? 8 : (isFirst ? 32 : 16),
-                "bottomInset": isFooter ? 13 : 8
-            ]
         case .plain:
             metrics = [
                 "topInset": 4,
                 "bottomInset": 3
             ]
+        default:
+            metrics = [
+                "topInset": isFooter ? 8 : (isFirst ? 32 : 16),
+                "bottomInset": isFooter ? 13 : 8
+            ]
+
         }
         
         contentViewConstraints = contentView.addConstraints(
