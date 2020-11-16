@@ -9,9 +9,9 @@
 import UIKit
 
 
-public class TableViewHeaderFooterView: UITableViewHeaderFooterView, TableViewHeaderFooterViewType {
+open class TableViewHeaderFooterView: UITableViewHeaderFooterView, TableViewHeaderFooterViewType {
 
-    lazy var label = UILabel()
+    public private(set) lazy var label = UILabel()
     public var isFooter = false
     public var isFirst = false
     public var tableViewStyle: UITableViewStyle = .plain
@@ -32,7 +32,7 @@ public class TableViewHeaderFooterView: UITableViewHeaderFooterView, TableViewHe
         super.init(coder: aDecoder)
     }
     
-    override public func didMoveToSuperview() {
+    override open func didMoveToSuperview() {
         super.didMoveToSuperview()
         
         if let tableView = superview as? UITableView {
