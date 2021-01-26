@@ -135,7 +135,9 @@ class TableViewWithKeepableOffset: UITableView {
             if let offset = offsetToKeep, newValue != offset {
                 newValue = offset
             }
-            super.contentOffset = newValue
+            if super.contentOffset != newValue {
+                super.contentOffset = newValue
+            }
         }
     }
 }
